@@ -18,8 +18,8 @@ const inPersonUsers = [
     {name: "Mykola", age: 19, city: "Brovary"}
 ];
 
-const onlinePath = 'main/online';
-const inPersonPath = 'main/inPerson';
+const onlinePath = path.join('main', 'online');
+const inPersonPath = path.join('main', 'inPerson');
 
 // і створити файли txt в папках (online, inPerson) в яких як дату покласти юзерів з ваших масивів,
 //     але щоб ваш файл виглядав як NAME: ім'я з обєкту і т.д і всі пункти з нового рядка.
@@ -29,54 +29,55 @@ const dirsAndFilesCreating = () => {
         if (err) {
             console.log(err);
             throw err;
-        } else {
-            fs.mkdir(path.join(__dirname, 'main', 'online'), (err, callback) => {
-                if (err) {
-                    console.log(err);
-                    throw err;
-                } else {
-                    for (let i = 0; i < onlineUsers.length; i++) {
-                        for (const key in onlineUsers[i]) {
-                            fs.writeFile(
-                                path.join(__dirname, onlinePath, `${onlineUsers[i].name}.txt`),
-                                `${key}: ${onlineUsers[i][key]}\n`,
-                                {flag: "a"},
-                                err => {
-                                    if (err) {
-                                        console.log(err);
-                                        throw err;
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            });
-            fs.mkdir(path.join(__dirname, 'main', 'inPerson'), err => {
-                if (err) {
-                    console.log(err);
-                    throw err;
-                } else {
-                    for (let i = 0; i < inPersonUsers.length; i++) {
-                        for (let key in inPersonUsers[i]) {
-                            fs.writeFile(
-                                path.join(__dirname, inPersonPath, `${inPersonUsers[i].name}.txt`),
-                                `${key}: ${inPersonUsers[i][key]}\n`,
-                                {flag: "a"},
-                                err => {
-                                    if (err) {
-                                        console.log(err);
-                                        throw err;
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            });
         }
+        
+        fs.mkdir(path.join(__dirname, 'main', 'online'), (err) => {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+            for (let i = 0; i < onlineUsers.length; i++) {
+                for (const key in onlineUsers[i]) {
+                    fs.writeFile(
+                        path.join(__dirname, onlinePath, `${onlineUsers[i].name}.txt`),
+                        `${key}: ${onlineUsers[i][key]}\n`,
+                        {flag: "a"},
+                        err => {
+                            if (err) {
+                                console.log(err);
+                                throw err;
+                            }
+                        }
+                    )
+                }
+            }
+        });
+        fs.mkdir(path.join(__dirname, 'main', 'inPerson'), err => {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+            for (let i = 0; i < inPersonUsers.length; i++) {
+                for (let key in inPersonUsers[i]) {
+                    fs.writeFile(
+                        path.join(__dirname, inPersonPath, `${inPersonUsers[i].name}.txt`),
+                        `${key}: ${inPersonUsers[i][key]}\n`,
+                        {flag: "a"},
+                        err => {
+                            if (err) {
+                                console.log(err);
+                                throw err;
+                            }
+                        }
+                    );
+                }
+            }
+        });
     });
 }
+
+// Коли ви це виконаєте напишіть функцію яка буде міняти місцями юзерів з одного файлу і папки в іншу. (ті, що
+// були в папці inPerson будуть в папці online)
 
 const filesReplacing = () => {
     for (let i = 0; i < onlineUsers.length; i++) {
@@ -87,34 +88,34 @@ const filesReplacing = () => {
                 if (err) {
                     console.log(err);
                     throw err;
-                } else {
-                    fs.rename(
-                        path.join(__dirname, inPersonPath, `${inPersonUsers[i].name}.txt`),
-                        path.join(__dirname, onlinePath, `${inPersonUsers[i].name}.txt`),
-                        err => {
-                            if (err) {
-                                console.log(err);
-                                throw err;
-                            }
-                        }
-                    )
                 }
+                fs.rename(
+                    path.join(__dirname, inPersonPath, `${inPersonUsers[i].name}.txt`),
+                    path.join(__dirname, onlinePath, `${inPersonUsers[i].name}.txt`),
+                    err => {
+                        if (err) {
+                            console.log(err);
+                            throw err;
+                        }
+                    }
+                );
             })
     }
 }
 
-// Коли ви це виконаєте напишіть функцію яка буде міняти місцями юзерів з одного файлу і папки в іншу. (ті, що
-// були в папці inPerson будуть в папці online)
+dirsAndFilesCreating(); //first execute this f() and comment it after
+// filesReplacing(); //then uncomment this f() and execute file again
 
-const init = () => {
-    return new Promise((resolve, reject) => {
-        dirsAndFilesCreating();
-    })
-}
 
-init().then(filesReplacing).catch(err => {
-    if (err) {
-        console.log(err);
-        throw err;
-    }
-})
+// const init = () => {
+//     return new Promise((resolve, reject) => {
+//         dirsAndFilesCreating();
+//     })
+// }
+
+// init().then(filesReplacing).catch(err => {
+//     if (err) {
+//         console.log(err);
+//         throw err;
+//     }
+// })
