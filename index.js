@@ -7,8 +7,8 @@
 // 4. зробити якщо не відпрацюють ендпоінти то на сторінку notFound редірект
 
 const express = require('express');
+const path = require('path');
 const hbs = require('express-handlebars');
-
 
 const app = express();
 
