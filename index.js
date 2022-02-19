@@ -44,7 +44,6 @@ app.post('/login', (req, res) => {
         res.redirect('notFound');
     } else {
         users.push({...req.body, id: users.length > 0 ? users.length + 1 : 1});
-        // console.log(users);
         res.redirect('/users');
     }
 })
