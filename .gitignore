@@ -1,3 +1,5 @@
 /node_modules/
 .idea
 package-lock.json
+.idea/modules.xml
+.idea/nodeJS_okten_sept.iml
