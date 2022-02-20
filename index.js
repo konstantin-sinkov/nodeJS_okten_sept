@@ -1,7 +1,14 @@
+// Необхідно розширити ваше ДЗ:
+// - додайте ендпоінт signIn який буде приймати email і password і якщо все вірно то редірект на сторінку
+// цього
+//
+// * хто хоче складніше реалізуйте видалення користувача. Кнопка повинна знаходитись на сторінці з інфою про
+// одного юзера. Після видалення редірект на "/users"
+
 const express = require('express');
 const path = require('path');
-const { engine } = require('express-handlebars');
-const {use} = require("express/lib/router");
+const {engine} = require('express-handlebars');
+const {use} = require('express/lib/router');
 
 const app = express();
 
@@ -14,51 +21,81 @@ app.set('view engine', '.hbs');
 app.engine('.hbs', engine({defaultLayout: false}));
 app.set('views', path.join(__dirname, 'static'));
 
-// 1. /login, поля які треба відрендерити в файлі hbs: firstName, lastName, email(унікальне поле), password,
-// age, city
-// просто зробити темплейт з цим усім і вводити свої дані які будуть пушитися в масив і редірект робити на
-// сторінку з усіма юзерами /users і перевірка чи такий імейл не існує, якщо існує то редірект на еррор пейдж
 let users = [];
+let error = '';
 
+// login routes
 app.get('/login', (req, res) => {
     res.render('login');
 })
 
-// 2. /users просто сторінка з усіма юзерами, але можна по квері параметрам їх фільтрувати по age і city
-app.get('/users', (req, res) => {
-    if (!req.query.age && !req.query.city) {
-        res.render('users', {users: users});
-    } else {
-        // console.log(req.query);
-        let filteredUsers = [];
-        filteredUsers = users.filter(user =>
-            user.age === req.query.age &&
-            user.city === req.query.city
+app.post('/login', ({body}, res) => {
+    if (users.some(user => user.email === body.email)) {
+        error = 'This email is already used!'
+        res.redirect('errorPage');
+        return;
+    }
+    users.push({...body, id: users.length > 0 ? users.length + 1 : 1});
+    res.redirect('/users');
+})
+
+//signIn routes
+app.get('/signIn', (req, res) => {
+    res.render('signIn.hbs');
+})
+
+app.post('/signIn', ({body}, res) => {
+    let signedUser = {};
+    if (users.some(user =>
+        user.email === body.email &&
+        user.password === body.password
+    )) {
+        signedUser = users.find(user =>
+            user.email === body.email &&
+            user.password === body.password
         );
-        res.render('users', {users: filteredUsers});
+        res.redirect(`/users/${signedUser.id}`);
+        return;
     }
+    error = 'Wrong email or password!'
+    res.redirect('errorPage');
 })
 
-app.post('/login', (req, res) => {
-    if (users.some(user => user.email === req.body.email)) {
-        res.redirect('notFound');
-    } else {
-        users.push({...req.body, id: users.length > 0 ? users.length + 1 : 1});
-        res.redirect('/users');
+
+//users routes
+app.get('/users', ({query}, res) => {
+    if (!query.age && !query.city) {
+        res.render('users', {users});
+        return;
     }
+    let filteredUsers = [];
+    filteredUsers = users.filter(user =>
+        user.age === query.age &&
+        user.city === query.city
+    );
+    res.render('users', {users: filteredUsers});
 })
 
-// 3. /user/:id сторінка з інфою про одного юзера
-app.get('/users/:id', (req, res) => {
-    const {id} = req.params; //catch the id in req.params which we type in url
-    // console.log(users);
-    // console.log(req.params);
+app.get('/users/:id', ({params}, res) => {
+    const {id} = params; //catch the id in req.params which we type in url
     res.render('user', {user: users[+id - 1]});
 })
 
-// 4. зробити якщо не відпрацюють ендпоінти то на сторінку notFound редірект
+app.post('/users/:id', ({params}, res) => {
+    const {id} = params;
+    users = users.splice(id - 2, 1);
+    res.redirect('/users');
+})
+
+
+//error route
+app.get('/errorPage', (req, res) => {
+    res.render('errorPage', {error});
+})
+
+//notFound route
 app.use((req, res) => {
-  res.render('notFound');
+    res.render('notFound');
 })
 
 app.listen('5200', () => {

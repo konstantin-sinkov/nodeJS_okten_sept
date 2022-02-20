@@ -22,6 +22,9 @@
         <p>Password - {{user.password}}</p>
         <p>Age - {{user.age}}</p>
         <p>City - {{user.city}}</p>
+        <form action="/users/{{user.id}}" method="post">
+            <button>Delete user</button>
+        </form>
     </div>
 </body>
 </html>
