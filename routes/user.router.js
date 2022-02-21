@@ -5,7 +5,7 @@ const userRouter = Router();
 
 userRouter.get('/', renderUsers);
 userRouter.get('/:id', renderUserById);
-userRouter.post(':id', deleteUserById);
+userRouter.post('/:id', deleteUserById);
 
 module.exports = userRouter;
 
